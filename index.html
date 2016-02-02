@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My Simple ToDo App</title>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/css/materialize.min.css" media="screen" title="no title" charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+      body {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+
+      main {
+        flex: 1 0 auto;
+      }
+
+      .item {
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="nav-wrapper">
+          <div class="container">
+          <a href="#" class="brand-logo">My Simple ToDo App</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li class="active"><a href="#!">All</a></li>
+            <li><a href="#!">Active</a></li>
+            <li><a href="#!">Complete</a></li>
+          </ul>
+        </div>
+        </div>
+      </nav>
+    </header>
+    <main>
+      <div class="container">
+        <div class="row">
+          <div class="col s12">
+
+            <!-- loading state -->
+            <h4>Loading Items...</h4>
+            <div class="progress">
+                <div class="indeterminate"></div>
+            </div>
+
+            <!-- loaded state -->
+            <h4>All Items</h4>
+            <div class="divider"></div>
+
+            <!-- empty state -->
+            <div class="valign-wrapper">
+              <h4 class="valign">Nothing to do - rock on!</h4>
+            </div>
+
+            <!-- edit state -->
+            <div class="section valign-wrapper">
+              <span class="col s11" id="item-3">
+                <input id="item-1" type="text" value="Title of todo item here">
+              </span>
+              <span class="col s1">
+                <a href="#!"><i class="small material-icons">check_circle</i></a>
+              </span>
+            </div>
+            <div class="divider"></div>
+
+            <!-- incomplete state -->
+            <div class="section valign-wrapper">
+              <span class="col s1">
+                <a href="#!"><i class="small material-icons">check_box_outline_blank</i></a>
+              </span>
+              <span class="col s10" id="item-3">
+                <strong>Title of todo item here</strong>
+              </span>
+              <span class="col s1">
+                <a href="#!"><i class="small material-icons">delete</i></a>
+              </span>
+            </div>
+            <div class="divider"></div>
+
+            <!-- completed state -->
+            <div class="section valign-wrapper">
+              <span class="col s1">
+                <a href="#!"><i class="small material-icons">check_box</i></a>
+              </span>
+              <span class="col s10" id="item-3">
+                <strong>Title of todo item here</strong>
+              </span>
+              <span class="col s1">
+                <a href="#!"><i class="small material-icons">delete</i></a>
+              </span>
+            </div>
+            <div class="divider"></div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer class="page-footer">
+      <div class="footer-copyright">
+        <div class="container">
+        © 2016 Copyright Text
+        </div>
+      </div>
+    </footer>
+    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+    <script type="text/javascript" src="./js/handlebars-v4.0.5.js"></script>
+    <script type="text/javascript" src="./js/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="./js/materialize.min.js"></script>
+    <script type="text/javascript" src="./js/app.js"></script>
+  </body>
+</html>
