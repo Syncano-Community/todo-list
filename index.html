@@ -56,10 +56,13 @@
     <script id="item-template" type="text/x-handlebars-template">
       <h4>All Items</h4>
       <div class="divider"></div>
+      <div class="section">
+          <input type="text" class="createTodo" placeholder="Add Todo">
+      </div>
       {{#each this}}
-        <div class="section valign-wrapper" data-id={{id}}>
+        <div class="section valign-wrapper" data-todoid={{todoid}}>
           <span class="col s1">
-            <a href="#!" class="toggleTodo"><i class="small material-icons">{{checked complete}}</i></a>
+            <a href="#!" class="toggleTodo" data-complete="{{complete}}"><i class="small material-icons">{{checked complete}}</i></a>
           </span>
           <span class="col s10">
             <strong class="editTodo">{{title}}</strong>
@@ -77,13 +80,13 @@
     </script>
 
     <script id="edit-item-template" type="text/x-handlebars-template">
-      <div class="section" data-id={{id}}>
+      <div class="section" data-todoid={{todoid}}>
           <input type="text" class="updateTodo" value="{{title}}">
       </div>
     </script>
 
 
-    <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     <script type="text/javascript" src="./js/handlebars-v4.0.5.js"></script>
     <script type="text/javascript" src="./js/jquery-2.2.0.min.js"></script>
     <script type="text/javascript" src="./js/materialize.min.js"></script>
