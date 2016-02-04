@@ -1,23 +1,3 @@
-var todos = [
-  {
-    complete: false,
-    title: 'Sample 1',
-    todoid: 1,
-  }, {
-    complete: false,
-    title: 'Sample 2',
-    todoid: 2,
-  }, {
-    complete: false,
-    title: 'Sample 3',
-    todoid: 3,
-  }, {
-    complete: false,
-    title: 'Sample 4',
-    todoid: 4,
-  },
-];
-
 const ENTER_KEY = 13;
 const ESCAPE_KEY = 27;
 const todoItemWrapper = '.section';
@@ -25,32 +5,72 @@ const $todoList = $('#todo-list');
 const itemTmpl = Handlebars.compile($('#item-template').html());
 const editTmpl = Handlebars.compile($('#edit-item-template').html());
 
+const utils = {
+  store: function(namespace, data) {
+    return localStorage.setItem(namespace, JSON.stringify(data));
+  },
+
+  retrieve: function(namespace) {
+    if (!localStorage.getItem(namespace)) {
+      localStorage.setItem(namespace, JSON.stringify([]));
+    }
+
+    return JSON.parse(localStorage.getItem(namespace));
+  },
+
+  createGuid: function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0;
+      var v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  },
+};
+
 //some handlebar helpers
 Handlebars.registerHelper('checked', function(c) {
   var out = c ? 'check_box' : 'check_box_outline_blank';
   return new Handlebars.SafeString(out);
 });
 
-//creates a guid for todoid
-var createGuid = function() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0;
-    var v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
+var todos;
+var filter;
+
+var render = function() {
+  $todoList.html(itemTmpl(getFilteredTodos()));
+  $('nav li.active').removeClass('active');
+  $('nav a[href="'+ location.hash +'"]').parent('li').addClass('active');
+  $('input.createTodo').focus();
+  utils.store('todos', this.todos);
+};
+
+//returns proper list of filtered todos
+var getFilteredTodos = function() {
+    if (filter === 'active') {
+      console.log(getActiveTodos());
+      return getActiveTodos();
+    }
+
+    if (filter === 'completed') {
+      console.log(getCompletedTodos());
+      return getCompletedTodos();
+    }
+
+    return todos;
+  };
+
+//returns list of active todos
+var getActiveTodos = function() {
+  return todos.filter(function(todo) {
+    return !todo.complete;
   });
 };
 
-var render = function(data) {
-  //data is optional - could be a filtered list.
-  //todos should come from local storage
-  var d = data || todos;
-  $todoList.html(itemTmpl(d));
-};
-
-var getTodos = function() {
-  //only run once to retrieve from server
-  //set to local storage?
-  return todos;
+//returns list of completd todos
+var getCompletedTodos = function() {
+  return todos.filter(function(todo) {
+    return todo.complete;
+  });
 };
 
 //get todo ui wrapper element
@@ -64,6 +84,7 @@ var getTodoId = function(el) {
   return $el.data('todoid');
 };
 
+//gets the array index of the todo item
 var getArrayIndex = function(todoid) {
   return todos.map(function(e) { return e.todoid; }).indexOf(todoid);
 };
@@ -85,18 +106,26 @@ var startEditMode = function(e) {
 //handle all clicks
 var _clickHandler = function(e) {
   e.preventDefault();
+  var todoid = getTodoId(e.target);
   switch (e.data) {
     //delete button clicked
     case 'delete':
-      _delete({ todoid: getTodoId(e.target) });
+      _delete({ todoid: todoid });
       break;
 
     //toggle completed
-    case 'update':
+    case 'toggle':
       var complete = $(e.currentTarget).data('complete');
-      _update({ todoid: getTodoId(e.target), complete: !complete });
+      _update({ todoid: todoid, complete: !complete });
       break;
+    case 'update':
+      if (e.data === 'update' && $(e.currentTarget).val() != '') {
+        _update({ todoid: todoid, title: $(e.currentTarget).val() });
+      } else {
+        render();
+      }
 
+      break;
     default:
 
   }
@@ -104,7 +133,8 @@ var _clickHandler = function(e) {
 
 //handle all key press
 var _keyHandler = function(e) {
-  //e.preventDefault();
+  var title = $(e.currentTarget).val();
+
   switch (e.which) {
     // escaping edit/create mode
     case ESCAPE_KEY:
@@ -113,12 +143,13 @@ var _keyHandler = function(e) {
 
     //confirming change
     case ENTER_KEY:
-      if (e.data === 'update') {
-        _update({ todoid: getTodoId(e.target), title: $(e.currentTarget).val() });
-      }
-
-      if (e.data === 'create') {
-        _create({ todoid: createGuid(), title: $(e.currentTarget).val(), complete: false });
+      if (e.data === 'update' && title != '') {
+        _update({ todoid: getTodoId(e.target), title: title });
+      } else if (e.data === 'create' && title != '') {
+        _create({ todoid: utils.createGuid(), title: title, complete: false });
+        $(e.currentTarget).val('');
+      }  else {
+        render();
       }
 
       break;
@@ -127,17 +158,17 @@ var _keyHandler = function(e) {
   }
 };
 
-//add new todo to the array
+//add new todo
 var _create = function(data) {
   var index = getArrayIndex(data.todoid);
   if (index != 0) {
     todos.push(data);
   }
-  console.log(todos);
+
   render();
 };
 
-//update existing todo
+//update  todo
 var _update = function(data) {
   var index = getArrayIndex(data.todoid);
 
@@ -152,7 +183,7 @@ var _update = function(data) {
   render();
 };
 
-//delete todo from array
+//delete todo
 var _delete = function(data) {
   var index = getArrayIndex(data.todoid);
 
@@ -166,23 +197,28 @@ var _delete = function(data) {
 $(document).ready(function() {
 
   //bind functions to ui
+  todos = utils.retrieve('todos');
 
+  $('.createTodo').bind('keyup', 'create', _keyHandler);
   $todoList.on('dblclick', '.editTodo', startEditMode.bind(this));
   $todoList.on('click', '.deleteTodo', 'delete', _clickHandler.bind(this));
-  $todoList.on('click', '.toggleTodo', 'update', _clickHandler.bind(this));
+  $todoList.on('click', '.toggleTodo', 'toggle', _clickHandler.bind(this));
   $todoList.on('keyup', '.updateTodo', 'update', _keyHandler.bind(this));
-  $todoList.on('keyup', '.createTodo', 'create', _keyHandler.bind(this));
+  $todoList.on('focusout', '.updateTodo', 'update', _clickHandler.bind(this));
 
-  // this.$newTodo.on('keyup', this.create.bind(this));
   // this.$toggleAll.on('change', this.toggleAll.bind(this));
   // this.$footer.on('click', '#clear-completed', this.destroyCompleted.bind(this));
-  // list.on('change', '.toggle', this.toggle.bind(this));
-  // list.on('dblclick', 'label', this.edit.bind(this));
-  // list.on('keyup', '.edit', this.editKeyup.bind(this));
-  // list.on('focusout', '.edit', this.update.bind(this));
-  // list.on('click', '.destroy', this.destroy.bind(this));
 
   //render todo list
-  render(getTodos());
+  new Router({
+    '/:filter': function(f) {
+      filter = f,
+      render();
+    },
+  }).init('#/all');
+
+
+  //$('a[href^="' + location.hash + '"]').addClass('active');
+
 
 });

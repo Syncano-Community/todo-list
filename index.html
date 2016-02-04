@@ -6,6 +6,8 @@
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/materialize.min.css" media="screen" title="no title" charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/javascript" src="./js/vendors/director.min.js"></script>
+
     <style>
       body {
         display: flex;
@@ -27,11 +29,11 @@
       <nav>
         <div class="nav-wrapper">
           <div class="container">
-          <a href="#" class="brand-logo">My Simple ToDo App</a>
+          <a href="#/all" class="brand-logo">My Simple ToDo App</a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li class="active"><a href="#!">All</a></li>
-            <li><a href="#!">Active</a></li>
-            <li><a href="#!">Complete</a></li>
+            <li><a href="#/all">All</a></li>
+            <li><a href="#/active">Active</a></li>
+            <li><a href="#/completed">Completed</a></li>
           </ul>
         </div>
         </div>
@@ -40,6 +42,11 @@
     <main>
       <div class="container">
         <div class="row">
+          <div class="col s12">
+            <div class="section">
+                <input type="text" class="createTodo" placeholder="Add Todo">
+            </div>
+          </div>
           <div class="col s12" id="todo-list"></div>
         </div>
       </div>
@@ -47,25 +54,20 @@
     <footer class="page-footer">
       <div class="footer-copyright">
         <div class="container">
-        © 2016 Copyright Text
+          &copy; 2016 My Simple ToDo App
         </div>
       </div>
     </footer>
 
 
     <script id="item-template" type="text/x-handlebars-template">
-      <h4>All Items</h4>
-      <div class="divider"></div>
-      <div class="section">
-          <input type="text" class="createTodo" placeholder="Add Todo">
-      </div>
       {{#each this}}
         <div class="section valign-wrapper" data-todoid={{todoid}}>
           <span class="col s1">
             <a href="#!" class="toggleTodo" data-complete="{{complete}}"><i class="small material-icons">{{checked complete}}</i></a>
           </span>
-          <span class="col s10">
-            <strong class="editTodo">{{title}}</strong>
+          <span class="col s10 editTodo">
+            <strong>{{title}}</strong>
           </span>
           <span class="col s1">
             <a href="#!" class="deleteTodo"><i class="small material-icons">delete</i></a>
@@ -74,7 +76,7 @@
         <div class="divider"></div>
       {{else}}
         <div class="valign-wrapper">
-          <h4 class="valign">Nothing to do - rock on!</h4>
+          <h4 class="valign">There are no todos to do here.</h4>
         </div>
       {{/each}}
     </script>
@@ -87,9 +89,9 @@
 
 
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
-    <script type="text/javascript" src="./js/handlebars-v4.0.5.js"></script>
-    <script type="text/javascript" src="./js/jquery-2.2.0.min.js"></script>
-    <script type="text/javascript" src="./js/materialize.min.js"></script>
+    <script type="text/javascript" src="./js/vendors/handlebars-v4.0.5.js"></script>
+    <script type="text/javascript" src="./js/vendors/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="./js/vendors/materialize.min.js"></script>
     <script type="text/javascript" src="./js/app.js"></script>
   </body>
 </html>
