@@ -1,3 +1,6 @@
+var syncano = new Syncano({ apiKey: 'ENTER YOUR API KEY HERE', instance: 'ENTER YOUR INSTANCE NAME HERE' });
+var todoClass = syncano.class('todoitems');
+
 const ENTER_KEY = 13;
 const ESCAPE_KEY = 27;
 const todoItemWrapper = '.section';
@@ -39,7 +42,7 @@ var filter;
 var render = function() {
   $todoList.html(itemTmpl(getFilteredTodos()));
   $('nav li.active').removeClass('active');
-  $('nav a[href="'+ location.hash +'"]').parent('li').addClass('active');
+  $('nav a[href="' + location.hash + '"]').parent('li').addClass('active');
   $('input.createTodo').focus();
   utils.store('todos', this.todos);
 };
@@ -106,7 +109,9 @@ var startEditMode = function(e) {
 //handle all clicks
 var _clickHandler = function(e) {
   e.preventDefault();
+
   var todoid = getTodoId(e.target);
+
   switch (e.data) {
     //delete button clicked
     case 'delete':
@@ -160,45 +165,57 @@ var _keyHandler = function(e) {
 
 //add new todo
 var _create = function(data) {
-  var index = getArrayIndex(data.todoid);
-  if (index != 0) {
-    todos.push(data);
-  }
-
-  render();
+  todoClass.dataobject().add(data).then(function(res) {
+    todos.push(res);
+    render();
+  });
 };
 
 //update  todo
 var _update = function(data) {
   var index = getArrayIndex(data.todoid);
 
-  if (data.hasOwnProperty('complete')) {
-    todos[index].complete = data.complete;
-  }
+  todoClass.dataobject(todos[index].id).update(data).then(function(res) {
+    if (data.hasOwnProperty('complete')) {
+      todos[index].complete = data.complete;
+    }
 
-  if (data.hasOwnProperty('title')) {
-    todos[index].title = data.title;
-  }
+    if (data.hasOwnProperty('title')) {
+      todoClass.dataobject(data.id).add(data).then(function(res) {
+        todos.push(res);
+        render();
+      });
 
-  render();
+      todos[index].title = data.title;
+    }
+
+    render();
+  });
+
 };
 
 //delete todo
 var _delete = function(data) {
   var index = getArrayIndex(data.todoid);
 
-  if (index > -1) {
-    todos.splice(index, 1);
-  }
+  todoClass.dataobject(todos[index].id).delete().then(function(res) {
+    if (index > -1) {
+      todos.splice(index, 1);
+    }
 
-  render();
+    render();
+  });
+
 };
 
 $(document).ready(function() {
 
-  //bind functions to ui
-  todos = utils.retrieve('todos');
+  todoClass.dataobject().list().then(function(res) {
+    todos = res.objects;
+    render();
+  });
 
+  //bind functions to ui
   $('.createTodo').bind('keyup', 'create', _keyHandler);
   $todoList.on('dblclick', '.editTodo', startEditMode.bind(this));
   $todoList.on('click', '.deleteTodo', 'delete', _clickHandler.bind(this));
@@ -216,9 +233,5 @@ $(document).ready(function() {
       render();
     },
   }).init('#/all');
-
-
-  //$('a[href^="' + location.hash + '"]').addClass('active');
-
 
 });
